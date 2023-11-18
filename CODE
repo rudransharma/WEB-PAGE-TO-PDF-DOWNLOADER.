@@ -1,1 +1,71 @@
+import os
+import tkinter as tk
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+import json
+import requests
 
+def get_driver():
+    # Specify the home directory path for saving the PDF
+    home_directory = os.path.expanduser('~')
+    download_directory = os.path.join(home_directory, 'Downloads')
+
+    # Chrome options settings
+    chrome_options = webdriver.ChromeOptions()
+    settings = {
+        "recentDestinations": [
+            {"id": "Save as PDF", "origin": "local", "account": ""}
+        ],
+        "selectedDestinationId": "Save as PDF",
+        "version": 2,
+    }
+
+    prefs = {
+        "printing.print_preview_sticky_settings.appState": json.dumps(settings),
+        "download.default_directory": download_directory
+    }
+    chrome_options.add_experimental_option("prefs", prefs)
+    chrome_options.add_argument("--kiosk-printing")
+
+    # Launch browser with predefined settings
+    driver_manager = ChromeDriverManager()
+    driver_path = driver_manager.install()
+    browser = webdriver.Chrome(executable_path=driver_path, options=chrome_options)
+    return browser
+
+def download_article():
+    url = entry.get()  # Get URL from the entry field
+    if requests.get(url).status_code == 200:
+        try:
+            browser = get_driver()
+            browser.get(url)
+            browser.execute_script("window.print();")
+            browser.close()
+            status_label.config(text="Your article is successfully downloaded")
+        except Exception as e:
+            status_label.config(text=str(e))
+    else:
+        status_label.config(text="Enter a valid working URL")
+
+def create_gui():
+    root = tk.Tk()
+    root.title("Web Page to PDF Downloader")
+
+    label = tk.Label(root, text="Enter article URL:")
+    label.pack()
+
+    global entry
+    entry = tk.Entry(root, width=50)
+    entry.pack()
+
+    download_button = tk.Button(root, text="Download", command=download_article)
+    download_button.pack()
+
+    global status_label
+    status_label = tk.Label(root, text="")
+    status_label.pack()
+
+    root.mainloop()
+
+if _name_ == "_main_":
+    create_gui()
