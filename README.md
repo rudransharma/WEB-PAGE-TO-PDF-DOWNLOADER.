@@ -24,7 +24,7 @@ Chrome browser
 Troubleshooting
 If encountering issues, ensure all dependencies are correctly installed and up-to-date. Verify the availability of a stable internet connection and the presence of an updated Chrome browser.
 
-Contributions
+Contributions :
 Contributions to enhance the tool, fix issues, or add new features are welcome! Please fork the repository, make your changes, and submit a pull request.
 
 License
